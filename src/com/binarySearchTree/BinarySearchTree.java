@@ -55,6 +55,21 @@ public class BinarySearchTree implements List {
 
     @Override
     public void traverseList() {
+        if(root == null) {
+            System.out.println("The list is empty");
+            return;
+        }
+    }
 
+    private void traverseList(Item currentItem) {
+        if(currentItem.previous() != null) {
+            traverseList(currentItem.previous());
+        } else {
+            System.out.println(currentItem.getValue() + " ");
+        }
+
+        if(currentItem.next() != null) {
+            traverseList(currentItem.next());
+        }
     }
 }
