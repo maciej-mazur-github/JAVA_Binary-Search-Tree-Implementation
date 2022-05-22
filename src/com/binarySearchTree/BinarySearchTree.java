@@ -1,5 +1,7 @@
 package com.binarySearchTree;
 
+import java.util.Stack;
+
 public class BinarySearchTree implements List {
     private Item root = null;
 
@@ -14,13 +16,18 @@ public class BinarySearchTree implements List {
 
         if(root == null) {
             root = addedItem;
+            System.out.println("Value " + addedItem.getValue() + " added successfully as root");
             return;
         } else {
-            addItemRecursive(root, addedItem);
+            if(addItemRecursive(root, addedItem)) {
+                System.out.println("Value " + addedItem.getValue() + " added successfully");
+            } else {
+                System.out.println("Value " + addedItem.getValue() + " already exists in BST. Adding not processed");
+            }
         }
     }
 
-    private void addItemRecursive(Item currentItem, Item addedItem) {
+    private boolean addItemRecursive(Item currentItem, Item addedItem) {
         int comparison = currentItem.compareTo(addedItem);
 
         if(comparison > 0) {
@@ -36,11 +43,10 @@ public class BinarySearchTree implements List {
                 addItemRecursive(currentItem.next(), addedItem);
             }
         } else {
-            System.out.println("Value " + addedItem.getValue() + " already exists in BST. Adding not processed");
-            return;
+            return false;
         }
 
-        System.out.println("Value " + addedItem.getValue() + " added successfully");
+        return true;
     }
 
     @Override
@@ -59,17 +65,82 @@ public class BinarySearchTree implements List {
             System.out.println("The list is empty");
             return;
         }
+
+        traverseList(root);
     }
 
     private void traverseList(Item currentItem) {
-        if(currentItem.previous() != null) {
+        if(currentItem != null) {
             traverseList(currentItem.previous());
-        } else {
-            System.out.println(currentItem.getValue() + " ");
-        }
-
-        if(currentItem.next() != null) {
+            System.out.print(currentItem.getValue() + " ");
             traverseList(currentItem.next());
         }
     }
+
+    public void traverseWithStackAndNoRecursion() {
+        if(root == null) {
+            System.out.println("The list is empty");
+            return;
+        }
+
+        Item currentItem = root;
+        Stack<Item> stack = new Stack<>();
+
+        while(currentItem != null || !stack.isEmpty()) {
+            while(currentItem != null) {
+                stack.push(currentItem);
+                currentItem = currentItem.previous();
+            }
+
+            currentItem = stack.pop();
+            System.out.print(currentItem.getValue() + " ");
+            currentItem = currentItem.next();
+        }
+    }
+
+
+    public void traverseNoStackNoRecursion() {
+        if(root == null) {
+            System.out.println("The list is empty");
+            return;
+        }
+
+        Item currentInOrder = root;
+        Item previousInOrder;
+
+        while(currentInOrder != null) {
+            if(currentInOrder.previous() == null) {
+                System.out.print(currentInOrder.getValue() + " ");
+                currentInOrder = currentInOrder.next();
+            } else {
+                previousInOrder = currentInOrder.previous();
+
+                while(previousInOrder.next() != null && previousInOrder.next() != currentInOrder) {
+                    previousInOrder = previousInOrder.next();
+                }
+
+                if(previousInOrder.next() == null) {
+                    previousInOrder.setNext(currentInOrder);    // temporary change made to the original tree
+                    currentInOrder = currentInOrder.previous();
+                } else {
+                    previousInOrder.setNext(null);              // reversing the changes made to the original tree
+                    System.out.print(currentInOrder.getValue() + " ");
+                    currentInOrder = currentInOrder.next();
+                }
+
+            }
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
