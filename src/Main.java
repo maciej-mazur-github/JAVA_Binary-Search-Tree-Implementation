@@ -4,15 +4,17 @@ public class Main {
     public static void main(String[] args) {
         BinarySearchTree bst = new BinarySearchTree();
 
-        bst.addItem("6");
-        bst.addItem("1");
-        bst.addItem("9");
-        bst.addItem("2");
-        bst.addItem("8");
-        bst.addItem("3");
-        bst.addItem("7");
-        bst.addItem("4");
-        bst.addItem("5");
+        bst.addItemNonRecursive("6");
+        bst.addItemNonRecursive("1");
+        bst.addItemNonRecursive("9");
+        bst.addItemNonRecursive("2");
+        bst.addItemNonRecursive("8");
+        bst.addItemNonRecursive("3");
+        bst.addItemNonRecursive("7");
+        bst.addItemNonRecursive("4");
+        bst.addItemNonRecursive("5");
+        bst.addItemNonRecursive("5");
+
 
         System.out.println("\n\n");
         bst.traverseList();

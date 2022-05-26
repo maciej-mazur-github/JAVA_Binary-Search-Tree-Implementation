@@ -49,9 +49,54 @@ public class BinarySearchTree implements List {
         return true;
     }
 
-    @Override
-    public void removeItem(Object item) {
 
+    public void addItemNonRecursive(Object addedValue) {
+        Item addedItem = new Node(addedValue);
+
+        if(root == null) {
+            root = addedItem;
+            System.out.println("Value " + addedItem.getValue() + " added successfully as root");
+            return;
+        }
+
+        int comparison;
+        Item currentItem = root;
+        boolean quit = false;
+
+        while(!quit) {
+            comparison = currentItem.compareTo(addedItem);
+
+            if(comparison > 0) {
+                if(currentItem.previous() == null) {
+                    currentItem.setPrevious(addedItem);
+                    System.out.println((String) addedValue + " added successfully");
+                    quit = true;
+                } else {
+                    currentItem = currentItem.previous();
+                }
+            } else if(comparison < 0) {
+                if(currentItem.next() == null) {
+                    currentItem.setNext(addedItem);
+                    System.out.println((String) addedValue + " added successfully");
+                    quit = true;
+                } else {
+                    currentItem = currentItem.next();
+                }
+            } else {       // no duplicates allowed
+                System.out.println((String) addedValue + " already exists in the tree. Duplicates not allowed");
+                quit = true;
+            }
+        }
+    }
+
+    @Override
+    public void removeItem(Object removedValue) {
+        Item removedItem = new Node(removedValue);
+
+        if(root == null) {
+            System.out.println("The list is empty, nothing to remove here");
+            return;
+        }
     }
 
     @Override
