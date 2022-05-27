@@ -97,11 +97,57 @@ public class BinarySearchTree implements List {
             System.out.println("The list is empty, nothing to remove here");
             return;
         }
+
+        Item foundItem = containsItemRecursive(root, removedItem);
+
+        if(foundItem == null) {
+            System.out.println((String) removedValue + " not found in the tree");
+            return;
+        }
+
+
+    }
+
+    private Item removeItemRecursively(Item successiveItem, Item removedItem) {
+        int comparison =
     }
 
     @Override
-    public Item containsItem(Object item) {
-        return null;
+    public Item containsItem(Object searchedValue) {
+        if(root == null) {
+            System.out.println("The list is empty, nothing to remove here");
+            return null;
+        }
+
+        Item searchedItem = new Node(searchedValue);
+
+        if(searchedItem != null) {
+            System.out.println((String) searchedValue + " found in the tree");
+        } else {
+            System.out.println((String) searchedValue + " not found in the tree");
+        }
+        return null;        // no further processing expected using this method; containsItemRecursive(Item, Item) planned to be used for removeItem(Object)
+    }
+
+
+    private Item containsItemRecursive(Item currentItem, Item searchedItem) {
+        int comparison = currentItem.compareTo(searchedItem);
+
+        if(comparison > 0) {
+            if(currentItem.previous() == null) {
+                return null;
+            } else {
+                addItemRecursive(currentItem.previous(), searchedItem);
+            }
+        } else if(comparison < 0) {
+            if(currentItem.next() == null) {
+                return null;
+            } else {
+                containsItemRecursive(currentItem.next(), searchedItem);
+            }
+        }
+
+        return currentItem;  // in case the searchedValue equals the currentItem value
     }
 
     @Override
