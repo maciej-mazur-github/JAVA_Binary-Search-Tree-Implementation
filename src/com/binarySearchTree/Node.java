@@ -5,6 +5,8 @@ public class Node extends Item {
         super(value);
     }
 
+
+
     @Override
     public Item next() {
         return rightLink;

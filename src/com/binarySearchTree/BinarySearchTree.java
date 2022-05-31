@@ -4,6 +4,8 @@ import java.util.Stack;
 
 public class BinarySearchTree implements List {
     private Item root = null;
+    private boolean foundSearchedItem = false;
+    private Item lastFoundItem;
 
     @Override
     public Item getRoot() {
@@ -17,7 +19,6 @@ public class BinarySearchTree implements List {
         if(root == null) {
             root = addedItem;
             System.out.println("Value " + addedItem.getValue() + " added successfully as root");
-            return;
         } else {
             if(addItemRecursive(root, addedItem)) {
                 System.out.println("Value " + addedItem.getValue() + " added successfully");
@@ -69,7 +70,7 @@ public class BinarySearchTree implements List {
             if(comparison > 0) {
                 if(currentItem.previous() == null) {
                     currentItem.setPrevious(addedItem);
-                    System.out.println((String) addedValue + " added successfully");
+                    System.out.println(addedValue + " added successfully");
                     quit = true;
                 } else {
                     currentItem = currentItem.previous();
@@ -77,39 +78,74 @@ public class BinarySearchTree implements List {
             } else if(comparison < 0) {
                 if(currentItem.next() == null) {
                     currentItem.setNext(addedItem);
-                    System.out.println((String) addedValue + " added successfully");
+                    System.out.println(addedValue + " added successfully");
                     quit = true;
                 } else {
                     currentItem = currentItem.next();
                 }
             } else {       // no duplicates allowed
-                System.out.println((String) addedValue + " already exists in the tree. Duplicates not allowed");
+                System.out.println(addedValue + " already exists in the tree. Duplicates not allowed");
                 quit = true;
             }
         }
     }
 
     @Override
-    public void removeItem(Object removedValue) {
-        Item removedItem = new Node(removedValue);
-
+    public void removeItem(Object valueToRemove) {
         if(root == null) {
             System.out.println("The list is empty, nothing to remove here");
             return;
         }
+        
+        Item itemToRemove = new Node(valueToRemove);
+        removeItemRecursively(root, itemToRemove);
 
-        Item foundItem = containsItemRecursive(root, removedItem);
-
-        if(foundItem == null) {
-            System.out.println((String) removedValue + " not found in the tree");
-            return;
+        if(foundSearchedItem) {
+            System.out.println("\"" + valueToRemove + "\" removed successfully");
+            foundSearchedItem = false;
+        } else {
+            System.out.println("\"" + valueToRemove + "\" not found in the tree");
         }
-
-
     }
 
-    private Item removeItemRecursively(Item successiveItem, Item removedItem) {
-        int comparison =
+    private Item removeItemRecursively(Item currentItem, Item itemToRemove) {
+        if(currentItem == null) {
+            return null;
+        }
+
+        int comparison = currentItem.compareTo(itemToRemove);
+
+        if(comparison > 0) {
+            currentItem.leftLink = removeItemRecursively(currentItem.leftLink, itemToRemove);
+            return currentItem;
+
+        } else if(comparison < 0) {
+            currentItem.rightLink = removeItemRecursively(currentItem.rightLink, itemToRemove);
+            return currentItem;
+        }
+
+        return processRemoval(currentItem);
+    }
+
+    private Item processRemoval(Item removedItem) {
+        foundSearchedItem = true;
+
+        if(removedItem.previous() == null && removedItem.next() == null) {     // when removed item has no children
+            return null;
+        } else if(removedItem.previous() != null && removedItem.next() == null) {   // when removed item has left subtree only
+            return removedItem.previous();
+        } else if(removedItem.previous() == null && removedItem.next() != null) {   // when removed item has right subtree only
+            return removedItem.next();
+        } else {
+            Item smallestRightItem = findSmallestRightItem(removedItem.rightLink);
+            removedItem.setValue(smallestRightItem.getValue());
+            removedItem.rightLink = removeItemRecursively(removedItem.rightLink, smallestRightItem);
+            return removedItem;
+        }
+    }
+
+    private Item findSmallestRightItem(Item item) {
+        return item.leftLink == null ? item : findSmallestRightItem(item.leftLink);
     }
 
     @Override
@@ -120,34 +156,44 @@ public class BinarySearchTree implements List {
         }
 
         Item searchedItem = new Node(searchedValue);
+        containsItemRecursive(root, searchedItem);
 
-        if(searchedItem != null) {
-            System.out.println((String) searchedValue + " found in the tree");
+        if(foundSearchedItem) {
+            System.out.println(searchedValue + " found in the tree");
+            foundSearchedItem = false;
         } else {
-            System.out.println((String) searchedValue + " not found in the tree");
+            System.out.println(searchedValue + " not found in the tree");
         }
         return null;        // no further processing expected using this method; containsItemRecursive(Item, Item) planned to be used for removeItem(Object)
     }
 
 
     private Item containsItemRecursive(Item currentItem, Item searchedItem) {
+        if(currentItem == null) {
+            return null;
+        }
+
+        lastFoundItem = null;
         int comparison = currentItem.compareTo(searchedItem);
 
         if(comparison > 0) {
-            if(currentItem.previous() == null) {
-                return null;
-            } else {
-                addItemRecursive(currentItem.previous(), searchedItem);
-            }
+            currentItem.leftLink = containsItemRecursive(currentItem.leftLink, searchedItem);
         } else if(comparison < 0) {
-            if(currentItem.next() == null) {
-                return null;
-            } else {
-                containsItemRecursive(currentItem.next(), searchedItem);
-            }
+            currentItem.rightLink = containsItemRecursive(currentItem.rightLink, searchedItem);
+        } else {
+            foundSearchedItem = true;
+            lastFoundItem = currentItem;
         }
 
         return currentItem;  // in case the searchedValue equals the currentItem value
+    }
+
+    public void getContainsItemLastResult() {
+        if(lastFoundItem != null) {
+            System.out.println("Last containsItem() value was: " + lastFoundItem.getValue());
+        } else {
+            System.out.println("No item found in recent search");
+        }
     }
 
     @Override
